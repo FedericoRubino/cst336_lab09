@@ -2,26 +2,50 @@
 
 <div class="container">
     <div class ="jumbotron">
-        <h1> Popular Quotes </h1>
-        <form action='/author' method="GET" >
-            <div class="form-group row">
-                <label for="firstname" class="col-sm-4 col-form-label"> First Name: </label>
-                <div class="col-sm-4">
-                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder='Firstname'>
-                </div>
-            </div>
+        <h1 style="text-align:center;"> Search by Author Name </h1>
+        <br>
+		<form action='/quoteAuthor' method='GET'>
+			<div class='form-group row'>
+				<label style="text-align:right;" for='name' class='col-sm-4 col-form-label'></label>
+				<div class='col-sm-4'>
+					<select id="name" name="name">
+					    <%var i = 0;%>
+						<%fullnames.forEach(function(name){%>
+				            <option id="name" name ="name" value='<%=name%>'><%=name%></option>
+				        <%});%>
+					</select>
+				</div>
+			</div>
+			<div class='form-group row'>
+				<div class='col-sm-4'></div>
+				<div class='col-sm-4'>
+					<button class='btn btn-primary btn-block'>Search</button>
+				</div>
+				<div class='col-sm-4'></div>
+			</div>
+		</form>
 
+
+    </div>
+</div>
+
+<div class="container">
+    <div class ="jumbotron">
+        <h1 style="text-align:center;"> Quotes by Keyword </h1>
+        <br>
+        <form action='/quoteKeyword' method="GET" >
+            
             <div class="form-group row">
-                <label for="lastname" class="col-sm-4 col-form-label"> Last Name: </label>
+                <label style="text-align:right;" for="keyword" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-4">
-                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder='Lastname'>
+                    <input type="text" class="form-control" id="keyword" name="keyword" placeholder='Keyword'>
                 </div>
             </div>
             
             <div class="form-group row">
                 <div class="col-sm-4"> </div>
                 <div class="col-sm-4">
-                    <button class="btn btn-primary btn-block"> Search Author </button> 
+                    <button class="btn btn-primary btn-block"> Search Quote </button> 
                 </div>
             </div>
             <div class="col-sm-4"></div>            
@@ -29,5 +53,56 @@
     </div>
 </div>
 
+<div class="container">
+    <div class ="jumbotron">
+        <h1 style="text-align:center;"> Quotes by Category </h1>
+        <br>
+		<form action='/quoteCategory' method='GET'>
+			<div class='form-group row'>
+				<label style="text-align:right;" for='category' class='col-sm-4 col-form-label'></label>
+				<div class='col-sm-4'>
+					<select id="category" name="category">
+						<%categories.forEach(function(category){%>
+				            <option id="category" name ="category" value='<%=category%>'><%=category%></option>
+				        <%});%>
+					</select>
+				</div>
+			</div>
+			<div class='form-group row'>
+				<div class='col-sm-4'></div>
+				<div class='col-sm-4'>
+					<button class='btn btn-primary btn-block'>Search</button>
+				</div>
+				<div class='col-sm-4'></div>
+			</div>
+		</form>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class ="jumbotron">
+        <h1 style="text-align:center;"> Quotes by Gender </h1>
+        <br>
+        <form action='/gender' method='GET'>
+			<div class='form-group row'>
+				<label style="text-align:right;" for='gender' class='col-sm-4 col-form-label'></label>
+				<div class='col-sm-4'>
+					<label for="male">Male</label>
+					<input type="radio" id="male" name="gender" value="M" required>
+					<label for="female">Female</label>
+					<input type="radio" id="female" name="gender" value="F" required>
+				</div>
+			</div>
+			<div class='form-group row'>
+				<div class='col-sm-4'></div>
+				<div class='col-sm-4'>
+					<button class='btn btn-primary btn-block'>Search</button>
+				</div>
+				<div class='col-sm-4'></div>
+			</div>
+		</form>
+    </div>
+</div>
 
 <%- include('templates/footer'); -%>

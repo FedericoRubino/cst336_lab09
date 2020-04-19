@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class ="jumbotron">
-        <h1 style="text-align:center;"> Found Author </h1>
+        <h1 style="text-align:center;"> Found Quotes </h1>
         <div class="row">
             <div class="col-sm-4"></div>
             <button class="col-sm-4 btn btn-info btn-block" onclick="location.href='/';"> Search Again </button> 
@@ -10,14 +10,17 @@
         </div>
     </div>
     
+    <%if(!authors){%>
+        <h1 class='col-sm-12 nofound'>CANNOT FIND YOUR QUOTES!!!</h1>
+    <%}else{%>
+        <h3> Quotes: "<%=keyword%>"</h3>
+        <ul>
+            <%authors.forEach(function(author){%>
+                <li><%=author.quote%> <a href='/author/<%=author.authorId%>'><%=author.lastName%></a></li>
+            <%});%>
     
-    <h3> Quotes from <%=name%></h3>
-    <ul>
-        <%quotes.forEach(function(q){%>
-            <li><%=q.quote%></li>
-        <%});%>
-
-    </ul>
+        </ul>
+    <%}%>
 </div>
 
 
