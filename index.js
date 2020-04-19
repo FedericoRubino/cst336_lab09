@@ -10,10 +10,10 @@ var app = express();
 
 /* Configure mysql dbms */
 const connection = mysql.createConnection({
-	host: "localhost",
-	user: "frubino",
-	password: "frubino",
-	database: "new_database"
+	host: "un0jueuv2mam78uv.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+	user: "hz5nbp4iluujbllh",
+	password: "s7xzbnqojilaz860",
+	database: "p6zg6wa2vkqv2y4c"
 });
 
 connection.connect();
