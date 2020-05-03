@@ -6,7 +6,17 @@ Lab09
 
 var express = require("express");
 var mysql = require("mysql");
+var bcrypt = require('bcrypt');
+var session = require('express-session');
+var methodOverride = require('method-override');
+var bodyParser = require('body-parser');
+
+
 var app = express();
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(methodOverride('_method'));
+
+
 
 /* Configure mysql dbms */
 const connection = mysql.createConnection({
@@ -18,9 +28,25 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
+
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.static("css"));
+
+app.use(session({
+	secret: "wabbadubbadubdub!!",
+	resave: true,
+	saveUninitialized: true
+}));
+
+
+/* Middleware functions */
+function isAuthenticated(req, res, next){
+	if(!req.session.authenticated){ 
+		res.redirect('/login');
+	} else next();
+}
+
 
 app.get("/", function(req, res){
 	var stmtCategory = "select distinct(l9_quotes.category) from l9_quotes;";
@@ -46,7 +72,7 @@ app.get("/", function(req, res){
 				categories.push(f.category);
 			})
 		}
-	    res.render('home', {categories:categories,fullnames:fullnames,authors:authors});
+	    res.render('home', {categories:categories,fullnames:fullnames,authors:authors, admin:req.session.authenticated});
     });
 });
 
@@ -128,6 +154,130 @@ app.get("/author/:authorId", function(req, res){
 		}
 		res.render('author', {author:author});
 	});
+});
+
+
+/* 
+
+additions for lab 10!!!
+
+*/
+
+/* logout rout */
+app.get('/logout', isAuthenticated, function(req, res) {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+// get's you to the login page
+app.get("/login", function(req, res) {
+    res.render("login");
+});
+
+
+/* login an admin */
+app.post("/admin/login", function(req, res){
+	let admin = "admin";
+	let password = "admin"; 
+	var usernameMatch = admin == req.body.username;
+	var passwordMatch = password == req.body.password;
+	
+	if(passwordMatch && usernameMatch){
+		req.session.authenticated = true;
+		res.redirect('/');	
+	} else {
+		req.session.authenticated = false;
+		res.render('login', {error: true});
+	}
+});
+
+
+//path to the admin page
+app.get("/admin/page", isAuthenticated, function(req,res){
+	var statement = "Select * from l9_author"
+	connection.query(statement,function(error, found) {
+	   if(error) throw error;
+	   var authors = null;
+	   if(found.length){
+	   		authors = found;
+	   		authors.forEach(function(author){
+   				author.dob = author.dob.toString().split(" ").splice(0,4).join(" ");
+				author.dod = author.dod.toString().split(" ").splice(0,4).join(" ");
+	   		})
+			res.render("adminPage", {authors:authors});
+	   }
+	});
+});
+
+
+
+/* sends us to the create new author page */
+app.get("/new_author",isAuthenticated, function(req, res) {
+   res.render('new_author'); 
+});
+
+app.post("/author/new",isAuthenticated, function(req, res) {
+	var authorId = -1;
+	let firstname = req.body.Firstname;
+	let lastname = req.body.Lastname;
+	let sex = req.body.sex;
+	let dob = req.body.dob;
+	let dod = req.body.dod;
+	let profession = req.body.profession;
+	connection.query('SELECT COUNT(*) FROM l9_author;', function(error, found){
+	    if(error) throw error;
+	    if(found.length){
+			// console.log(found[0]['COUNT(*)'] + 1);
+	    	authorId = found[0]['COUNT(*)'] + 1;
+    		var statement = "INSERT INTO l9_author (authorId, firstName, lastName, dob, dod, sex, profession, country, portrait, biography) VALUES(?,?,?,?,?,?,?,?,?,?);";
+			connection.query(statement,[authorId,firstname,lastname,dob,dod,sex,profession," "," "," "],function(error,result){
+				if(error) throw error;
+				res.redirect("/admin/page");
+			});
+	    }
+	});
+});
+
+/* sends us to the edit page for author */
+app.get("/author/:authrId/edit", isAuthenticated, function(req, res){
+	var authorId = req.params.authrId;
+    var statement = "select * from l9_author "+
+    				"where authorId=" + authorId + ";" ; 
+    connection.query(statement,function(error,found){
+    	var author = null;
+    	if(error) throw error;
+		if(found.length){
+			author = found[0]; // this gets us all of the data from the database of the given author
+		}
+		res.render('edit_author', {author:author});
+    });
+});
+
+/* updates the user information */
+app.put("/update/:authrID", isAuthenticated, function(req, res) {
+    console.log(req.body);
+    
+    var statement = "UPDATE l9_author SET " +
+    				"firstName = '" + req.body.Firstname + "'," +
+    				"lastName  = '" + req.body.Lastname + "'," +
+    				"sex = '" + req.body.sex + "'," +
+    				"profession = '" + req.body.profession + "'" +
+    				"WHERE authorID = " + req.params.authrID + ";";
+    console.log(statement);
+    connection.query(statement,function(error, found) {
+        if(error) throw error;
+	    res.redirect("/admin/page");
+    })
+})
+
+
+/* delete a user - needs some protection */
+app.get("/author/:authrId/delete", isAuthenticated, function(req, res) {
+    var statement = "DELETE FROM l9_author where authorId=" + req.params.authrId + ";";
+    connection.query(statement, function(error, found) {
+        if(error) throw error;
+        res.redirect("/admin/page");
+    });
 });
 
 app.get("/*", function(req, res){

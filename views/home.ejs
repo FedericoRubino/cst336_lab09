@@ -1,6 +1,33 @@
 <%- include('templates/header'); -%>
 
 <div class="container">
+	
+	<div class ="jumbotron">
+        <h1 style="text-align:center;"> Lab 10 Additions </h1>
+        
+        <%if(admin){%>
+        	<br>
+        	<h3 style="text-align:center;">Admin is logged in</h3>
+        	<br>
+        <%} else {%>
+        	<h5 style="text-align:center;">To login as an Admin: username "admin", password: "admin"</h5>
+        <%}%>
+        
+		<div class='form-group row'>
+			<div class="col-sm-4"> </div>
+        	<button class="col-sm-4 btn btn-info btn-block" onclick="location.href='/login';" >Admin Login</button> 
+		</div>
+		<div class='form-group row'>
+			<div class="col-sm-4"> </div>
+        	<button class="col-sm-4 btn btn-info btn-block" onclick="location.href='/logout';" >Admin Logout</button> 
+		</div>
+		<div class='form-group row'>
+	        <div class="col-sm-4"> </div>	
+        	<button class="col-sm-4 btn btn-info btn-block" onclick="location.href='/admin/page';" >Edit Authors</button> 
+	    </div>
+        <div class="col-sm-4"></div>
+    </div>
+    
     <div class ="jumbotron">
         <h1 style="text-align:center;"> Search by Author Name </h1>
         <br>
